@@ -194,8 +194,8 @@ const DEF={stats:{},equip:[],fx:'none',pron:'',loc:'',tags:[],link:'',song:'',ca
 let S={...DEF};try{S={...DEF,...JSON.parse(localStorage.getItem('uab_ui')||'{}')}}catch(e){}
 const map={};
 const SM={Online:'on',Idle:'idle','Do not disturb':'dnd',Invisible:'off'},SL={on:'Online',idle:'Idle',dnd:'Do not disturb',off:'Offline'};
-const person=id=>id=='me'?{n:S.name,u:S.name.toLowerCase().replace(/[^a-z0-9]+/g,'.').replace(/^\.|\.$/g,'')||'you',s:SM[S.status],bio:S.bio,act:S.act,since:'Today',fx:S.fx,eq:S.equip,st:S,bn:S.bannerImg}:(P[id]||UNK);
-function avEl(id,dot=true){const p=person(id),d=document.createElement('div');d.className='av'+(id=='me'?' '+S.av:'');const u=id=='me'?S.avatar:p.av;if(u)d.style.backgroundImage='url("'+u.replace(/"/g,'%22')+'")';else{d.style.background=tint(id=='me'?'me-'+S.name:id);d.textContent=(p.n||'?').trim()[0]||'?'}if(dot&&p.s!='off'||dot&&id!='me'){const t=document.createElement('span');t.className='dot s-'+p.s;d.append(t)}d.dataset.id=id;{const X=p.st||{};if(X.shape&&X.shape!='circle')d.classList.add('sh-'+X.shape);if(X.frame&&X.frame!='none')d.classList.add('fr-'+X.frame)}return d}
+const person=id=>id=='me'?{n:S.name,u:window.MYU||S.name.toLowerCase().replace(/[^a-z0-9]+/g,'.').replace(/^\.|\.$/g,'')||'you',s:SM[S.status],bio:S.bio,act:S.act,since:'Today',fx:S.fx,eq:S.equip,st:S,bn:S.bannerImg}:(P[id]||UNK);
+function avEl(id,dot=true){const p=person(id),d=document.createElement('div');d.className='av'+(id=='me'?' '+S.av:'');const u=id=='me'?S.avatar:p.av;if(u)d.style.backgroundImage='url("'+u.replace(/"/g,'%22')+'")';else{d.style.background=tint(id=='me'?'me-'+S.name:id);d.textContent=((p.n||'?').match(/[\p{L}\p{N}]/u)||['?'])[0]}if(dot&&p.s!='off'||dot&&id!='me'){const t=document.createElement('span');t.className='dot s-'+p.s;d.append(t)}d.dataset.id=id;{const X=p.st||{};if(X.shape&&X.shape!='circle')d.classList.add('sh-'+X.shape);if(X.frame&&X.frame!='none')d.classList.add('fr-'+X.frame)}return d}
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 let com,ch,joined=[...COMS];
 function renderRail(){const r=$('cs');r.innerHTML='';const hb=el('button','sv');hb.style.cssText='background:var(--a);color:var(--on);border:0';hb.title='My Space';hb.setAttribute('aria-label','My Space');hb.innerHTML='<svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>';hb.onclick=()=>openDrawer('space');r.append(hb,el('div','sep'));joined.forEach(c=>{const b=el('button','sv'+(c==com?' on':''));b.style.background=tint(c.id);b.textContent=c.name.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();b.title=c.name;b.setAttribute('aria-label',c.name);b.onclick=()=>pick(c);r.append(b)});
@@ -277,7 +277,7 @@ function authDlg(mode){if(!LIVE){const f=el('div','box pad');f.append(el('b',0,'
  show(f)}
 async function boot(){
  const {data:me,error}=await sb.from('profiles').select('*').eq('id',uid).single();if(error)return toast(error.message);
- S={...S,avatar:me.avatar_url||'',bannerImg:me.banner_url||'',name:me.display_name||me.username,bio:me.bio||'',act:me.activity||'',status:me.status||'Online',...(me.settings||{})};
+ window.MYU=me.username;S={...S,avatar:me.avatar_url||'',bannerImg:me.banner_url||'',name:me.display_name||me.username,bio:me.bio||'',act:me.activity||'',status:me.status||'Online',...(me.settings||{})};
  const {data:rows,error:e2}=await sb.from('community_members').select('role,communities(id,name,description)').eq('user_id',uid);if(e2)return toast(e2.message);
  joined=rows.map(r=>({id:r.communities.id,name:r.communities.name,desc:r.communities.description||'',m:{},ch:{},chid:{},loaded:{}}));
  for(const c of joined)await loadCom(c);
